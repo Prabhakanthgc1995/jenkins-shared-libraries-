@@ -1,4 +1,4 @@
-@Library('my-shared-library@main') _  // Correct syntax
+@Library('my-shared-library@main') _
 
 pipeline {
     agent { label 'dev' }
@@ -9,59 +9,79 @@ pipeline {
         PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
     }
 
-    stages {
+   stages {
         stage('Checkout Code') {
             steps {
-                checkoutCode()
-            }
-        }
-
+		script {
+			newfile.checkscm()
+		}		
+       	}
+     }
         stage('Set up Java 17') {
             steps {
-                setupJava()
+                script {
+                	newfile.setupjava()
+                }
             }
-        }
+	}
 
         stage('Set up Maven') {
             steps {
-                setupMaven()
+                script {
+                	newfile.mavensetup()
+		}
             }
         }
 
         stage('Build with Maven') {
             steps {
-                buildProject()
+                script {
+			newfile.build()
+		}
             }
         }
 
         stage('Upload Artifact') {
             steps {
-                uploadArtifact('target/bus-booking-app-1.0-SNAPSHOT.jar')
+                uploadArtifact('target/petclinic-0.0.1-SNAPSHOT.jar')
             }
         }
 
         stage('Run Application') {
             steps {
-                runApplication()
+                script {
+		newfile.runApp()
+				}
             }
         }
 
         stage('Validate App is Running') {
-            steps {
-                validateApp()
-            }
+          	steps {
+               	script {
+					newfile.validateApp()
+				}
+			}
         }
-
-        stage('Gracefully Stop Spring Boot App') {
-            steps {
-                stopApplication()
-            }
+        stage('wait') {
+			steps {
+				script {
+					newfile.waiting()
+				}
+			}
         }
-    }
-
-    post {
-        always {
-            cleanup()
+        stage('stoping') {
+			steps {
+				script {
+					newfile.stop()
+				}
+			}
         }
+         stage('cleaning') {
+			steps {
+				script {
+					newfile.clean()
+				}
+			}
+        }        
     }
 }
